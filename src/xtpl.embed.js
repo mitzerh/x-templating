@@ -6,7 +6,8 @@
 
     (function($, DomReady, EventMessageHandler){
 
-        var scripts = document.getElementsByTagName("script"),
+        var TEMPLATE_STORE = {},
+            scripts = document.getElementsByTagName("script"),
             src = null;
 
         // get the embed script source path
@@ -56,6 +57,14 @@
             }
         };
 
+        var bindEvent = function(target, event, fn) {
+            if (target.addEventListener) {
+                target.addEventListener(event, fn, false);
+            } else if (target.attachEvent) {
+                target.attachEvent("on" + event, fn);
+            }
+        };
+
         var App = function() {
 
             this.VERSION = "${version}";
@@ -71,14 +80,40 @@
          * @param  {Function} callback  callback funciton
          */
         App.prototype.get = function(template, callback) {
-            var tplId = "get-template|" + template;
-
-            EventMessageHandler.addHandler(tplId, function(evt, data){
-                callback(data);
-            });
-
             OnReady(function(){
-                EventMessageHandler.sendMessage(document.getElementById(ifrId), tplId, { id: tplId, template: template });
+
+                var eventId = "get.template",
+                    tplId = [eventId, template].join("_"),
+                    iframe = document.getElementById(ifrId);
+
+                // stored template
+                if (TEMPLATE_STORE[tplId]) {
+
+                    callback(TEMPLATE_STORE[tplId].markup);
+
+                } else {
+
+                    EventMessageHandler.addHandler(tplId, function(data){
+                        TEMPLATE_STORE[tplId] = data;
+                        callback(data.markup);
+                    });
+
+                    var trigger = function() {
+                        EventMessageHandler.sendMessage(iframe, eventId, { id: tplId, template: template });
+                    };
+
+                    if ($) {
+                        $(iframe).bind("load", function(){
+                            trigger();
+                        });
+                    } else {
+                        bindEvent(iframe, "load", function() {
+                            trigger();
+                        });
+                    }
+
+                }
+
             });
         };
 

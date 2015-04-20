@@ -53,15 +53,34 @@ module.exports = function(grunt) {
             },
 
             app: {
-                files: [
-                    {
-                        src: 'src/app.js',
-                        dest: 'dest/assets/app.js'
+
+                src: 'src/app.js',
+                dest: 'dest/assets/app.js',
+                options: {
+                    process: function (content, srcpath) {
+                        
+                        content = content.replace('${version}', conf.version);
+
+                        content = content.replace('\/\/inclue:domready', (function(){
+                            var ret = grunt.file.read(__dirname + '/dest/tmp/domready.js');
+                            return ret;
+                        }()));
+
+                        content = content.replace('\/\/inclue:messenger', (function(){
+                            var ret = grunt.file.read(__dirname + '/dest/tmp/messenger.js');
+                            return ret;
+                        }()));
+
+                        content = [comment, content].join('\n\n');
+
+                        return content;
 
                     }
-                ]
-            },
 
+                }
+
+            },
+            
             assets: {
                 cwd: 'src/assets',
                 src: '**/*',
