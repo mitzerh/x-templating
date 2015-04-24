@@ -49,7 +49,7 @@
             DomReady(function(){
                 execFN();
             });
-        };
+        }
 
         function bindEvent(target, event, fn) {
             if (target.addEventListener) {
@@ -57,7 +57,7 @@
             } else if (target.attachEvent) {
                 target.attachEvent("on" + event, fn);
             }
-        };
+        }
 
         var App = function() {
 
