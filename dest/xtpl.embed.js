@@ -21,7 +21,7 @@
         // to determine the domain to use
         for (var i = 0; i < scripts.length; i++) {
             var attr = scripts[i].getAttribute("src") || "";
-            if (attr.indexOf("/xtpl.embed.js") > -1) {
+            if (attr.indexOf("/xtpl.embed.min.js") > -1) {
                 src = attr;
                 break;
             }
@@ -29,7 +29,7 @@
 
         if (!src) { return false; }
 
-        var path = src.replace("/xtpl.embed.js", "/assets"),
+        var path = src.replace("/xtpl.embed.min.js", "/assets"),
             ifrId = "x-templating-ifr",
             ifrSrc = path +  "/frame.html";
 
